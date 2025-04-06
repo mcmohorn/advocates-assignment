@@ -25,3 +25,5 @@ As an example, I included a `useDebounce()` hook.  This hook is intended to igno
 I went with MaterialUI because that is the component library I know the best.  I could have spent a lot more time tweaking this user interface and making it more beautiful, but I would want to sit with an actual user to understand their needs and how I can show/ hide the right information in the right places.
 
 Pagination is still handled on the front end, but obviously this would be inefficient with millions or records, so the query parameters `limit` and `offset` would be forwarded to the backend.
+
+I was rushing when I was styling, so as another organizational improvement, I would collect the `sx` and `style` objects into a single file so I can re-use those objects and find them / re-style more easily.
