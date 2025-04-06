@@ -1,91 +1,88 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdvocatesAPI } from "./services/Advocates";
+import { useDebounce } from "./hooks/useDebouce";
+import AdvocatesTable from "./components/AdvocatesTable";
+import {
+  AppBar,
+  Box,
+  IconButton,
+  TextField,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { Replay } from "@mui/icons-material";
 
 export default function Home() {
   const [advocates, setAdvocates] = useState([]);
-  const [filteredAdvocates, setFilteredAdvocates] = useState([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Debouncing - a technique used to not trigger too many state changes
+  // we use it here to not send too many calls to the backend while the ure types
+  const debouncedInputValue = useDebounce(query, 500); // 500ms delay
 
   useEffect(() => {
-    console.log("fetching advocates...");
-    fetch("/api/advocates").then((response) => {
-      response.json().then((jsonResponse) => {
-        setAdvocates(jsonResponse.data);
-        setFilteredAdvocates(jsonResponse.data);
-      });
-    });
-  }, []);
+    getAdvocates();
+  }, [debouncedInputValue]);
 
-  const onChange = (e) => {
-    const searchTerm = e.target.value;
-
-    document.getElementById("search-term").innerHTML = searchTerm;
-
-    console.log("filtering advocates...");
-    const filteredAdvocates = advocates.filter((advocate) => {
-      return (
-        advocate.firstName.includes(searchTerm) ||
-        advocate.lastName.includes(searchTerm) ||
-        advocate.city.includes(searchTerm) ||
-        advocate.degree.includes(searchTerm) ||
-        advocate.specialties.includes(searchTerm) ||
-        advocate.yearsOfExperience.includes(searchTerm)
-      );
-    });
-
-    setFilteredAdvocates(filteredAdvocates);
+  const getAdvocates = async () => {
+    try {
+      setLoading(true);
+      const as = await AdvocatesAPI.search(query);
+      setAdvocates(as);
+    } catch (error) {
+      // TODO: use existing error setup
+      // alert(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onClick = () => {
-    console.log(advocates);
-    setFilteredAdvocates(advocates);
+  // get advocates initially on page load
+  useEffect(() => {
+    getAdvocates();
+  }, []);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value;
+    setQuery(searchTerm);
+  };
+
+  const onReset = () => {
+    setQuery("");
   };
 
   return (
-    <main style={{ margin: "24px" }}>
-      <h1>Solace Advocates</h1>
+    <main style={{}}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Solace Advocates
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
       <br />
       <br />
-      <div>
-        <p>Search</p>
-        <p>
-          Searching for: <span id="search-term"></span>
-        </p>
-        <input style={{ border: "1px solid black" }} onChange={onChange} />
-        <button onClick={onClick}>Reset Search</button>
-      </div>
+      <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+        <TextField
+          sx={{ width: 400, marginLeft: "10px" }}
+          value={query}
+          onChange={onChange}
+          placeholder="Search by name, city, degree, years, or specialty"
+        />
+        <Tooltip title="Reset">
+          <IconButton onClick={onReset} disabled={query.length === 0}>
+            <Replay />
+          </IconButton>
+        </Tooltip>
+      </Box>
       <br />
+      <AdvocatesTable advocates={advocates} loading={loading} />
       <br />
-      <table>
-        <thead>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>City</th>
-          <th>Degree</th>
-          <th>Specialties</th>
-          <th>Years of Experience</th>
-          <th>Phone Number</th>
-        </thead>
-        <tbody>
-          {filteredAdvocates.map((advocate) => {
-            return (
-              <tr>
-                <td>{advocate.firstName}</td>
-                <td>{advocate.lastName}</td>
-                <td>{advocate.city}</td>
-                <td>{advocate.degree}</td>
-                <td>
-                  {advocate.specialties.map((s) => (
-                    <div>{s}</div>
-                  ))}
-                </td>
-                <td>{advocate.yearsOfExperience}</td>
-                <td>{advocate.phoneNumber}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
     </main>
   );
 }

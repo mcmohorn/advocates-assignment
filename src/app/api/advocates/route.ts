@@ -1,10 +1,18 @@
 import db from "../../../db";
 import { advocates } from "../../../db/schema";
-import { advocateData } from "../../../db/seed/advocates";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Search } from "./service";
+export async function GET(req: NextApiRequest) {
+  // TODO: extract query normally with?
+  // const {q} = req.query
+  const q = decodeURI(req.url?.split("=")[1] || "");
 
-export async function GET() {
+  try {
+    const data = await Search(q);
 
-  const data = await db.select().from(advocates);
-
-  return Response.json({ data });
+    return Response.json({ data });
+  } catch (error) {
+    console.log('error' , error);
+    return Response.error();
+  }
 }
