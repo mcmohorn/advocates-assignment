@@ -12,6 +12,11 @@
     "seed": "node --loader esbuild-register/loader -r esbuild-register ./src/db/seed/index.ts"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.1",
+    "@mui/material": "^6.1.1",
+    "@mui/x-data-grid": "^7.28.3",
     "drizzle-orm": "^0.32.1",
     "next": "^14.2.19",
     "postgres": "^3.4.4",
@@ -20,9 +25,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.12",
+    "@types/pg": "^8.11.11",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "drizzle-kit": "^0.23.0",
+    "drizzle-kit": "^0.23.2",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.5",
     "postcss": "^8.4.40",
